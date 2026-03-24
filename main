@@ -1,0 +1,84 @@
+# Import libraries
+import pandas as pd
+import numpy as np
+
+# ML libraries
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+# Load dataset (CSV file)
+# Replace with your dataset file path
+data = pd.read_csv("forestfires.csv")
+
+# Display first 5 rows
+print(data.head())
+
+# ---------------------------
+# Data Preprocessing
+# ---------------------------
+
+# Convert categorical values if needed
+# Example: fire column (yes/no → 1/0)
+if 'fire' in data.columns:
+    data['fire'] = data['fire'].map({'yes': 1, 'no': 0})
+
+# Fill missing values
+data = data.fillna(data.mean(numeric_only=True))
+
+# ---------------------------
+# Feature Selection
+# ---------------------------
+
+# Example features (modify based on dataset)
+features = ['temperature', 'humidity', 'wind', 'rain']
+
+# Target variable
+target = 'fire'
+
+X = data[features]
+y = data[target]
+
+# ---------------------------
+# Train Test Split
+# ---------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# ---------------------------
+# Model Training
+# ---------------------------
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# ---------------------------
+# Prediction
+# ---------------------------
+
+y_pred = model.predict(X_test)
+
+# ---------------------------
+# Evaluation
+# ---------------------------
+
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\nModel Accuracy:", accuracy)
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+# ---------------------------
+# Predict New Data
+# ---------------------------
+
+# Example input: [temperature, humidity, wind, rain]
+new_data = np.array([[30, 45, 10, 0]])
+
+prediction = model.predict(new_data)
+
+if prediction[0] == 1:
+    print("\n🔥 High Risk of Forest Fire")
+else:
+    print("\n✅ Low Risk of Forest Fire")
